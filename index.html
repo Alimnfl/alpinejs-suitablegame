@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alim Suitable Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style type="text/tailwindcss">
+
+        @layer components {
+        .title {
+            @apply text-6xl font-bold text-center my-5 bg-gradient-to-r from-red-500 to-blue-400
+        bg-clip-text text-transparent
+        }
+
+        .grid-container{
+            @apply grid grid-cols-2 gap-2 p-2 content-center md:grid-cols-4 md:gap-4 md:p-4;
+        }
+        .grid-card {
+            @apply aspect-[4/3] rounded-lg bg-gray-500 hover:scale-95 transition-all
+            duration-500 cursor-pointer;
+        }
+    }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.0/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+</head>
+
+<body>
+    <div class=" justify-center" x-data="game()">
+        <div class="mx-4 text-center mt-10 bg-lime-200 p-10 rounded-xl shadow">
+            <h1 class="title">Suitable Color Game - Alimnfl</h1>
+        </div>
+
+        <div class="grid-container">
+            <template x-for="card in cards">
+                <div class="aspect-[4/3]">
+                    <div class="grid-card" :class="['bg-' + (card.flipped ? card.color : 'gray') +'-500', 
+                    card.animate]" @click="flipCard(card)" x-show="!card.cleared"></div>
+                </div>
+            </template>
+        </div>
+    </div>
+</body>
+
+<script>
+    const delay = (milliseconds = 500) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+    const game = () => {
+        return {
+            cards: [
+                { color: 'red', flipped: false, cleared: false, animate: '' },
+                { color: 'green', flipped: false, cleared: false, animate: '' },
+                { color: 'blue', flipped: false, cleared: false, animate: '' },
+                { color: 'yellow', flipped: false, cleared: false, animate: '' },
+                { color: 'red', flipped: false, cleared: false, animate: '' },
+                { color: 'green', flipped: false, cleared: false, animate: '' },
+                { color: 'blue', flipped: false, cleared: false, animate: '' },
+                { color: 'yellow', flipped: false, cleared: false, animate: '' }
+            ].sort(() => Math.random() - 0.5),
+            get flippedCards() {
+                return this.cards.filter((card) => card.flipped);
+            },
+            get remainingCards() {
+                return this.cards.filter((card) => !card.cleared);
+            },
+
+            // Pakai Asyncronous
+            async flipCard(card) {
+
+                //Agar tak bisa lebih dari 2 kartu
+                if (this.flippedCards.length === 2) return;
+
+                //buka tutup kartu biar GG
+                card.flipped = !card.flipped;
+
+                //jika kartu 2 terbuka, sama atau kaga
+
+                if (this.flippedCards.length === 2) {
+                    if (this.flippedCards[0].color === this.flippedCards[1].color) {
+                        //animasi sebelum dia hilang
+                        this.flippedCards.forEach((card) => card.animate = 'animate__animated animate__rubberBand');
+                        await delay();
+                        this.flippedCards.forEach((card) => card.cleared = true);
+
+                        //Apakah kartu sudah kelar smua
+                        if (this.remainingCards.length === 0) {
+                            alert('You did it!');
+                            location.reload();
+                        }
+                    }
+                    //animasi sebelum ditutup kembali (Gagal)
+                    this.flippedCards.forEach((card) => card.animate = 'animate__animated animate__shakeX');
+                    // tutup kartu setelah pemeriksaan salah
+                    await delay();
+                    this.flippedCards.forEach((card) => card.flipped = false);
+                    //hilangkan class animasinya
+                    this.remainingCards.forEach((card) => card.animate = '');
+                }
+            }
+        }
+
+    }
+
+</script>
+
+<!-- Bentuk yang berbeda. -->
+<!-- if (card.flipped === false) {
+                    card.flipped = true;
+                } else {
+                    card.flipped = false;
+                } 
+            
+            CARA 2
+        card.flipped = (card.flipped === true) ? false : true-->
+
+<!-- Mengatur Waktu pada flipped Card -->
+<!-- setTimeout(() => {
+            this.flippedCard.forEach((card) => card.cleared = true);
+        }, 500) -->
+
+</html>
